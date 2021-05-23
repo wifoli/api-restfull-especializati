@@ -6,6 +6,8 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,6 +52,13 @@ class Handler extends ExceptionHandler
         if ($e instanceof MethodNotAllowedHttpException)
             if ($request->expectsJson())
                 return response()->json(['erro' => 'Method_Not_Allowed'], $e->getStatusCode());
+
+        if ($e instanceof TokenExpiredException)
+            return response()->json(['token_expired'], 401);
+            
+        if ($e instanceof TokenInvalidException)
+            return response()->json(['token_invalid'], 401);
+
 
         return parent::render($request, $e);
     }
